@@ -1,0 +1,16 @@
+{
+    "name": "guedes/sqs-abstract",
+    "description": "Abstract service to populate queues at AWS SQS parsing data.",
+    "keywords": ["AWS SQS", "AWS", "Amazon Web Service", "sqs abstract"],
+    "require": {
+        "php": ">=5.5.0",
+        "aws/aws-sdk-php": "^3.19"
+    },
+    "license": "GNU",
+    "authors": [
+        {
+            "name": "Wallison Marra",
+            "email": "unguedes@gmail.com"
+        }
+    ]
+}
