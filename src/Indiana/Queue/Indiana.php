@@ -12,18 +12,18 @@
  * 
  */
 
-namespace Indiana;
+namespace Indiana\Queue;
 
 use Indiana\Exception;
 use Aws\Sqs\SqsClient;
 use Respect\Validation\Validator as v;
 
-class Populate
+class Pile
 {
 	/**
 	 * 
 	 */
-	const QUEUE_NAME = '';
+	private $queueName = '';
 
 	/**
 	 *
@@ -54,7 +54,8 @@ class Populate
 	{
 
 		if(v::stringType()->validate($queueName)){
-			self::QUEUE_NAME = $queueName;
+				define(QUEUE_NAME,$queueName);
+
 		} else {
 			throw new RuntimeException('Invalid QUEUE_NAME setted.');
 		}
@@ -73,6 +74,43 @@ class Populate
 		}
 	}
 
+	/* */
+	function testArray($value)
+	{
+		foreach($value as $key){
+		if(!v::stringType()->validate($key)){			
+		$notString[] = $key;
+		}else{
+		$isString[] = $key;
+		}
+	}
+	if(v::nullType()->validate($notString)){
+		$value = $isString;
+		return $value;	
+	}else{
+		$result = $notString;
+		return "Invalid attribute integer setted.";
+		}
+	}
+	/*
+	*/
+
+	public function valAttr($value)
+	{
+		if(v::arrayType()->validate($value)){
+			$newValue = implode($value,",");
+			return $newValue;
+		}elseif(v::stringType()->validate($value)){
+			$newValue = $value;
+			return $newValue;
+		}elseif(v::intType()->validate($value)){
+			$newValue = $value;
+			return $value;
+		}else {
+			throw new RuntimeException('Invalid parameter value setted for \'$value\'.');
+		}
+	}
+
 	/**
 	 * [setAttr description]
 	 * @param [type] $name  [description]
@@ -84,8 +122,8 @@ class Populate
 			throw new RuntimeException('Invalid attribute name for \'$name\' setted.');
 		}
 
-		if(v::intType()->validate($value)) {
-			if (v::intVal()->validate($value){
+		if(v::intType()->validate($value)){
+			if(v::intVal()->validate($value)){
 
 			} else {
 				throw new RuntimeException('Invalid interger value setted for \'$name\'.');
@@ -97,6 +135,7 @@ class Populate
 		} else {
 			throw new RuntimeException('Invalid string value setted for \'$name\'.');
 		}
+		return $this;
 	}
 
 }
