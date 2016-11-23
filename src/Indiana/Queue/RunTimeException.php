@@ -13,8 +13,7 @@
  */
 namespace Indiana\Queue;
 
-class RunTimeException extends \RunTimeException {
+class RuntimeException extends \RuntimeException {
 /* Propriedades herdadas */
-
 
 }

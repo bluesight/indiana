@@ -12,12 +12,12 @@
     },
     "autoload":{
         "psr-0": {
-            "": "src/"
+            "Indiana\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-0": {
-            "tests\\": "src/"
+            "Indiana\\": "tests/"
         }
     },
     "license": "GNU",

@@ -14,7 +14,6 @@
 
 namespace Indiana\Queue;
 
-use Indiana\Queue\RunTimeException;
 use Aws\Sqs\SqsClient;
 use Respect\Validation\Validator as v;
 
