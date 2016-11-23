@@ -58,13 +58,22 @@ class Pile
 				$isString[] = $key;
 		}
 	}
-	if(v::nullType()->validate($notString)){
-		$value = $isString;
-		return $value;	
-	}else{
-		$result = $notString;
-		return "Invalid attribute integer setted.";
+		if(v::nullType()->validate($notString)){
+			$value = $isString;
+			return $value;	
+		}else{
+			$result = $notString;
+			return "Invalid attribute integer setted.";
 		}
+	}
+	
+	/**
+	 * [populateAMsgAttr description]
+	 * @return [type] [description]
+	 */
+	private function populateAMsgAttr($attrName, $attrValue, $attrType)
+	{
+
 	}
 	/**
 	 * [setQueueUrl description]
