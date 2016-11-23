@@ -18,7 +18,7 @@ use Indiana\Queue\RunTimeException;
 use Aws\Sqs\SqsClient;
 use Respect\Validation\Validator as v;
 
-class Pile
+class IndianaTest
 {
 	/**
 	 * 
@@ -103,11 +103,9 @@ class Pile
 	public function setAttr($name, $value)
 	{		
 		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
-			if(v::stringType()->validate($value)){
+			if(v::stringType()->validate($value) or v::intType()->intVal()->validate($value))
+			{
 				return $this;
-			}else if(v::intType()->intVal()->validate($value)){
-				return $this;
-				
 			}else{
 				throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
 			}
@@ -115,5 +113,7 @@ class Pile
 			throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
 		}	
 	}
+
+	
 
 }

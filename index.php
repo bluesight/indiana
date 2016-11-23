@@ -2,14 +2,17 @@
 
 require 'vendor/autoload.php'; 
 require 'src/Indiana/Queue/Indiana.php'; 
+require 'src/Indiana/Queue/RunTimeException.php';
 use Indiana\Queue\Pile;
+use Indiana\Queue\RunTimeException;
+
 
 $user = new Pile();
 
+$name = "cliente";
+$value = 2;
 
-$value = array('email1@uol.com.br', 'email2@bol.com.br', 'email3@aol.com.br');
 
-
-var_dump($user->testArray($value));
+var_dump($user->setAttr($name,$value));
 
 ?>
