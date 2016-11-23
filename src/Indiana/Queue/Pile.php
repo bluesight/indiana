@@ -39,11 +39,14 @@ class Pile
 	
 	protected function arrayPopulate($attrName,$attrValue,$attrTypeValidated){
 
+		/* MessageAttributes */
+
 		array_push($this->messageAttributes, array($attrName => array(
 			"StringValue" =>$attrValue, 
 			"DataType" => $attrTypeValidated)));
 
-		return $this->messageAttributes; 
+			return $this->messageAttributes; 
+
 	}
 
 	protected $messageBody = 'SENT';
@@ -150,16 +153,17 @@ class Pile
 	}
 
 
-	public function sendMessage($name,$value){
-
-		$data = $this->populateMsgAttr($name,$value);
+	public function sendMessage(){
 
 		$result = array(
 			"QueueUrl"=> $this->queueUrl,
 			"MessageBody" => $this->messageBody,
-			"DelaySeconds" => 5,$data
+			"DelaySeconds" => 5
 			 );
+
 		
+		$result['MessageAttributes'] = $this->messageAttributes;
+	
 		return $result;
 	}
 }

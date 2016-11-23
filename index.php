@@ -1,19 +1,26 @@
 <?php
 
 require 'vendor/autoload.php'; 
-require 'src/Indiana/Queue/Indiana.php'; 
-require 'src/Indiana/Queue/RunTimeException.php';
+
 use Indiana\Queue\Pile;
-use Indiana\Queue\RunTimeException;
+
 
 
 $user = new Pile();
 
 $name = "cliente";
 $value = 2;
+$name2 = "cliente2";
+$value2 = "texto2";
 
-echo "<pre>";
-var_dump($user->sendMessage($name,$value));
+
+$config = array(
+	'version' => 'latest',
+    'region'  => 'us-east-1');
+
+
+$sqs = new Aws\Sqs\SqsClient($config);
+$sqs->sendMessage($user->sendMessage());
 
 /*
 
