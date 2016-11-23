@@ -25,16 +25,28 @@ class Pile
 	 */
 	private $queueName = '';
 
+	private $queueUrl = "https://sqs.us-east-1.amazonaws.com/951717386538/OpTest";
+
 	/**
 	 *
 	 * @var Array
 	 */
-	private $messageAttributes = array();
+	public $messageAttributes = array();
 
 	/**
 	 * [$messageBody description]
 	 * @var string
 	 */
+	
+	protected function arrayPopulate($attrName,$attrValue,$attrTypeValidated){
+
+		array_push($this->messageAttributes, array($attrName => array(
+			"StringValue" =>$attrValue, 
+			"DataType" => $attrTypeValidated)));
+
+		return $this->messageAttributes; 
+	}
+
 	protected $messageBody = 'SENT';
 
 	/**
@@ -71,9 +83,21 @@ class Pile
 	 * [populateAMsgAttr description]
 	 * @return [type] [description]
 	 */
-	private function populateAMsgAttr($attrName, $attrValue, $attrType)
-	{
-
+	private function populateMsgAttr($attrName, $attrValue){
+		
+		if(v::stringType()->notEmpty()->validate($attrValue)){
+			$attrTypeValidated = "String";
+			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
+			return $result;
+			
+		}elseif(v::intType()->notEmpty()->validate($attrValue)){
+			$attrTypeValidated = "Number";	
+			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
+			return $result;
+			
+		}else{
+			throw new RuntimeException("Invalid attribute attrType for \'$attrType\'setted.");
+		}
 	}
 	/**
 	 * [setQueueUrl description]
@@ -113,10 +137,11 @@ class Pile
 	{		
 		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
 			if(v::stringType()->validate($value)){
+				$this->populateMsgAttr($name, $value);	
 				return $this;
 			}else if(v::intType()->intVal()->validate($value)){
+				$this->populateMsgAttr($name, $value);
 				return $this;
-				
 			}else{
 				throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
 			}
@@ -125,4 +150,42 @@ class Pile
 		}	
 	}
 
+
+	public function sendMessage($name,$value){
+
+		$data = $this->populateMsgAttr($name,$value);
+
+		$result = array(
+			"QueueUrl"=> $this->queueUrl,
+			"MessageBody" => $this->messageBody,
+			"DelaySeconds" => 5,$data
+			 );
+		
+		return $result;
+	}
 }
+
+
+/*
+
+$result = $client->sendMessage(array(
+    // QueueUrl is required
+    'QueueUrl' => 'string',
+    // MessageBody is required
+    'MessageBody' => 'string',
+    'DelaySeconds' => integer,
+    'MessageAttributes' => array(
+        // Associative array of custom 'String' key names
+        'String' => array(
+            'StringValue' => 'string',
+            'BinaryValue' => 'string',
+            'StringListValues' => array('string', ... ),
+            'BinaryListValues' => array('string', ... ),
+            // DataType is required
+            'DataType' => 'string',
+        ),
+        // ... repeated
+    ),
+));
+ */
+

@@ -12,7 +12,14 @@ $user = new Pile();
 $name = "cliente";
 $value = 2;
 
+echo "<pre>";
+var_dump($user->sendMessage($name,$value));
 
-var_dump($user->setAttr($name,$value));
+/*
 
-?>
+$s3 = new Aws\S3\S3Client([
+    'version' => 'latest',
+    'region'  => 'us-east-1'
+]);
+
+ */
