@@ -39,11 +39,15 @@ class Pile
 	
 	protected function arrayPopulate($attrName,$attrValue,$attrTypeValidated){
 
-		/* MessageAttributes */
-
-		array_push($this->messageAttributes, array($attrName => array(
+		 $this->messageAttributes[$attrName] = [
 			"StringValue" =>$attrValue, 
-			"DataType" => $attrTypeValidated)));
+			"DataType" => $attrTypeValidated
+		 ];
+	
+
+		/*array_push($this->messageAttributes, array($attrName => array(
+			"StringValue" =>$attrValue, 
+			"DataType" => $attrTypeValidated)));*/
 
 			return $this->messageAttributes; 
 
@@ -152,43 +156,15 @@ class Pile
 		}	
 	}
 
-
-	public function sendMessage(){
-
+	public function configMessage(){
 		$result = array(
 			"QueueUrl"=> $this->queueUrl,
 			"MessageBody" => $this->messageBody,
 			"DelaySeconds" => 5
 			 );
 
-		
 		$result['MessageAttributes'] = $this->messageAttributes;
 	
 		return $result;
 	}
 }
-
-
-/*
-
-$result = $client->sendMessage(array(
-    // QueueUrl is required
-    'QueueUrl' => 'string',
-    // MessageBody is required
-    'MessageBody' => 'string',
-    'DelaySeconds' => integer,
-    'MessageAttributes' => array(
-        // Associative array of custom 'String' key names
-        'String' => array(
-            'StringValue' => 'string',
-            'BinaryValue' => 'string',
-            'StringListValues' => array('string', ... ),
-            'BinaryListValues' => array('string', ... ),
-            // DataType is required
-            'DataType' => 'string',
-        ),
-        // ... repeated
-    ),
-));
- */
-
