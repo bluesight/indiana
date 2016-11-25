@@ -37,20 +37,18 @@ class Pile
 	 * @var string
 	 */
 	
+	/**
+	 * [arrayPopulate description]
+	 * @param  [String] $attrName          				[must be String]
+	 * @param  [String or Integer] $attrValue        	 [must be String or Integer]
+	 * @param  [String] $attrTypeValidated 				[String with values "string" or "number"]
+	 * @return [array]                   				 [returns array to be setted on message on sqs->sendMessage()]
+	 */
 	protected function arrayPopulate($attrName,$attrValue,$attrTypeValidated){
-
 		 $this->messageAttributes[$attrName] = [
 			"StringValue" =>$attrValue, 
-			"DataType" => $attrTypeValidated
-		 ];
-	
-
-		/*array_push($this->messageAttributes, array($attrName => array(
-			"StringValue" =>$attrValue, 
-			"DataType" => $attrTypeValidated)));*/
-
+			"DataType" => $attrTypeValidated];
 			return $this->messageAttributes; 
-
 	}
 
 	protected $messageBody = 'SENT';
@@ -66,6 +64,11 @@ class Pile
 	/**
 	 * @param  [String,Integer] 
 	 * @return [$this]
+	 */
+	/**
+	 * [arrayValidate verify the array contains only valid values and returns the invalid content]
+	 * @param  [array] $value [description]
+	 * @return [array]  $value   [return array with valid numbers or returns array with invalid values setted]
 	 */
 	private function arrayValidate($value)
 	{
@@ -86,7 +89,7 @@ class Pile
 	}
 	
 	/**
-	 * [populateAMsgAttr description]
+	 * [populateAMsgAttr verifiy te type of DataType and set String or Number]
 	 * @return [type] [description]
 	 */
 	private function populateMsgAttr($attrName, $attrValue){
