@@ -24,16 +24,33 @@ class Pile
 	 */
 	private $queueName = '';
 
+	private $queueUrl = "https://sqs.us-east-1.amazonaws.com/951717386538/OpTest";
+
 	/**
 	 *
 	 * @var Array
 	 */
-	private $messageAttributes = array();
+	public $messageAttributes = array();
 
 	/**
 	 * [$messageBody description]
 	 * @var string
 	 */
+	
+	/**
+	 * [arrayPopulate description]
+	 * @param  [String] $attrName          				[must be String]
+	 * @param  [String or Integer] $attrValue        	 [must be String or Integer]
+	 * @param  [String] $attrTypeValidated 				[String with values "string" or "number"]
+	 * @return [array]                   				 [returns array to be setted on message on sqs->sendMessage()]
+	 */
+	protected function arrayPopulate($attrName,$attrValue,$attrTypeValidated){
+		 $this->messageAttributes[$attrName] = [
+			"StringValue" =>$attrValue, 
+			"DataType" => $attrTypeValidated];
+			return $this->messageAttributes; 
+	}
+
 	protected $messageBody = 'SENT';
 
 	/**
@@ -47,6 +64,11 @@ class Pile
 	/**
 	 * @param  [String,Integer] 
 	 * @return [$this]
+	 */
+	/**
+	 * [arrayValidate verify the array contains only valid values and returns the invalid content]
+	 * @param  [array] $value [description]
+	 * @return [array]  $value   [return array with valid numbers or returns array with invalid values setted]
 	 */
 	private function arrayValidate($value)
 	{
@@ -67,12 +89,24 @@ class Pile
 	}
 	
 	/**
-	 * [populateAMsgAttr description]
+	 * [populateAMsgAttr verifiy te type of DataType and set String or Number]
 	 * @return [type] [description]
 	 */
-	private function populateAMsgAttr($attrName, $attrValue, $attrType)
-	{
-
+	private function populateMsgAttr($attrName, $attrValue){
+		
+		if(v::stringType()->notEmpty()->validate($attrValue)){
+			$attrTypeValidated = "String";
+			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
+			return $result;
+			
+		}elseif(v::intType()->notEmpty()->validate($attrValue)){
+			$attrTypeValidated = "Number";	
+			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
+			return $result;
+			
+		}else{
+			throw new RuntimeException("Invalid attribute attrType for \'$attrType\'setted.");
+		}
 	}
 	/**
 	 * [setQueueUrl description]
@@ -112,10 +146,11 @@ class Pile
 	{		
 		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
 			if(v::stringType()->validate($value)){
+				$this->populateMsgAttr($name, $value);	
 				return $this;
 			}else if(v::intType()->intVal()->validate($value)){
+				$this->populateMsgAttr($name, $value);
 				return $this;
-				
 			}else{
 				throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
 			}
@@ -124,4 +159,15 @@ class Pile
 		}	
 	}
 
+	public function configMessage(){
+		$result = array(
+			"QueueUrl"=> $this->queueUrl,
+			"MessageBody" => $this->messageBody,
+			"DelaySeconds" => 5
+			 );
+
+		$result['MessageAttributes'] = $this->messageAttributes;
+	
+		return $result;
+	}
 }

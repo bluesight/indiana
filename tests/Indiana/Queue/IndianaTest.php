@@ -18,7 +18,7 @@ use Indiana\Queue\RunTimeException;
 use Aws\Sqs\SqsClient;
 use Respect\Validation\Validator as v;
 
-class IndianaTest
+class Pile extends TestCase
 {
 	/**
 	 * 
@@ -29,12 +29,23 @@ class IndianaTest
 	 *
 	 * @var Array
 	 */
-	private $messageAttributes = array();
+	public $messageAttributes = array();
 
 	/**
 	 * [$messageBody description]
 	 * @var string
 	 */
+	
+	protected function arrayPopulate($attrName,$attrValue,$attrTypeValidated){
+
+		array_push($this->messageAttributes, 
+			array($attrName => array(
+			"StringValue" =>$attrValue, 
+			"DataType" => $attrTypeValidated)));
+
+		return $this->messageAttributes; 
+	}
+
 	protected $messageBody = 'SENT';
 
 	/**
@@ -58,12 +69,33 @@ class IndianaTest
 				$isString[] = $key;
 		}
 	}
-	if(v::nullType()->validate($notString)){
-		$value = $isString;
-		return $value;	
-	}else{
-		$result = $notString;
-		return "Invalid attribute integer setted.";
+		if(v::nullType()->validate($notString)){
+			$value = $isString;
+			return $value;	
+		}else{
+			$result = $notString;
+			return "Invalid attribute integer setted.";
+		}
+	}
+	
+	/**
+	 * [populateAMsgAttr description]
+	 * @return [type] [description]
+	 */
+	private function populateMsgAttr($attrName, $attrValue){
+		
+		if(v::stringType()->notEmpty()->validate($attrValue)){
+			$attrTypeValidated = "String";
+			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
+			return $result;
+			
+		}elseif(v::intType()->notEmpty()->validate($attrValue)){
+			$attrTypeValidated = "Number";	
+			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
+			return $result;
+			
+		}else{
+			throw new RuntimeException("Invalid attribute attrType for \'$attrType\'setted.");
 		}
 	}
 	/**
@@ -103,8 +135,11 @@ class IndianaTest
 	public function setAttr($name, $value)
 	{		
 		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
-			if(v::stringType()->validate($value) or v::intType()->intVal()->validate($value))
-			{
+			if(v::stringType()->validate($value)){
+				$this->populateMsgAttr($name, $value);	
+				return $this;
+			}else if(v::intType()->intVal()->validate($value)){
+				$this->populateMsgAttr($name, $value);
 				return $this;
 			}else{
 				throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
@@ -113,7 +148,4 @@ class IndianaTest
 			throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
 		}	
 	}
-
-	
-
 }
