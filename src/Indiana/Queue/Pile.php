@@ -38,6 +38,12 @@ class Pile
 	private $delaySeconds = 5;
 
 	/**
+	 * 
+	 * @var string
+	 */
+	private $messageId = "";
+
+	/**
 	 * Message body to send to the queue.
 	 * This is required by the queue, so we need to pass some String value to it.
 	 * This var is limited of 256kbps
@@ -76,6 +82,7 @@ class Pile
  	 */
 	private function populateMsgAttr($attrName, $attrValue)
 	{
+
 		if(v::stringType()->notEmpty()->validate($attrValue)){
 			$attrTypeValidated = "String";
 			$result = $this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
@@ -235,13 +242,53 @@ class Pile
 		return $this;
 	}
 
+
+	public function configSqsBatch(){
+
+		if(!v::stringType()->notEmpty()->validate($this->queueUrl)){
+			throw new RuntimeException("Invalid queueUrl.  Paramenter not setted!");
+		}
+		
+					$this->messageAttributes;
+	}
+
+	public function setBatchMessage(){
+	
+		$this->getQueueUrl()
+		 ->configSqsBatch();
+	}
+
+	public function configBatch(){
+		$idmd5 = md5($this->messageId = rand(10,100)); 
+
+		$this->queueObjToSendBatch = array(
+			"QueueUrl"=> $this->queueUrl,
+			"Entries" => array(
+					array(
+					"Id" => $idmd5,
+					"MessageBody" => $this->messageBody,
+					"DelaySeconds" => $this->delaySeconds,
+					"MessageAttributes" => $this->messageAttributes)
+			));
+		return $this->queueObjToSendBatch;
+
+	}
+
+	public function sendBatch(){
+
+		$batch = $this->configBatch();	
+		
+		$sqs      = $this->getSqsClient();
+		$callback = $sqs->sendMessageBatch($this->queueObjToSendBatch);
+
+		return $callback;	
+	}
 	/**
 	 * Send message attributes and message body to the queue named
 	 * @return Object 	Object returned by Aws\Sqs\SqsClient sendMessage method
 	 */
-	public function send()
-	{
-		$this->getQueueUrl()
+	public function send(){
+		$teste = $this->getQueueUrl()
 			->configSqsObj();
 
 		$sqs      = $this->getSqsClient();
@@ -249,4 +296,5 @@ class Pile
 
 		return $callback;
 	}
+
 }

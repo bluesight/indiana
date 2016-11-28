@@ -10,7 +10,7 @@
       <directory suffix="Test.php">tests/Extensions</directory>
       <directory suffix="Test.php">tests/Runner</directory>
       <directory suffix="Test.php">tests/Util</directory>
-      <directory suffix="Test.php">src/Indiana/Queue/Util</directory>
+      <directory suffix="Test.php">tests/Indiana/Queue/</directory>
 
     </testsuite>
 

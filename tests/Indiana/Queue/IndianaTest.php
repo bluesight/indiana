@@ -1,5 +1,5 @@
 <?php
-
+require 'vendor/autoload.php'; 
 /**
  *
  *
@@ -148,4 +148,42 @@ class Pile extends TestCase
 			throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
 		}	
 	}
+
+
+	public function testSetAttr($name, $value)
+	{		
+		$name = "testName";
+		$value = "testeValue"
+		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
+			if(v::stringType()->validate($value)){
+				$this->populateMsgAttr($name, $value);	
+				return $this;
+			}else if(v::intType()->intVal()->validate($value)){
+				$this->populateMsgAttr($name, $value);
+				return $this;
+			}else{
+				throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
+			}
+		}else{
+			throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
+		}	
+
+		$this->assertEquals(isString($name),$name));
+	}
+
+	 public function testPushAndPop()
+    {
+        $stack = array();
+        $this->assertEquals(0, count($stack));
+
+        array_push($stack, 'foo');
+        $this->assertEquals('foo', $stack[count($stack)-1]);
+        $this->assertEquals(1, count($stack));
+
+        $this->assertEquals('foo', array_pop($stack));
+        $this->assertEquals(0, count($stack));
+    }
+
+
+
 }
