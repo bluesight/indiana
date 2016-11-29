@@ -258,6 +258,10 @@ class Pile
 		 ->configSqsBatch();
 	}
 
+	/**
+	 * Construct the array to be setted and sended by aws
+	 * @return [type] [description]
+	 */
 	public function configBatch(){
 		$idmd5 = md5($this->messageId = rand(10,100)); 
 
@@ -271,9 +275,12 @@ class Pile
 					"MessageAttributes" => $this->messageAttributes)
 			));
 		return $this->queueObjToSendBatch;
-
 	}
 
+	/**
+	 * Send message attributes and message body to queue up to 10 attributtes
+	 * @return Object returned by Aws\Sqs\SqsClient sendMessage method
+	 */
 	public function sendBatch(){
 
 		$batch = $this->configBatch();	

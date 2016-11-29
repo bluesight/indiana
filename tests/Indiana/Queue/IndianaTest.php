@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php'; 
+
 /**
  *
  *
@@ -18,7 +18,7 @@ use Indiana\Queue\RunTimeException;
 use Aws\Sqs\SqsClient;
 use Respect\Validation\Validator as v;
 
-class Pile extends TestCase
+class Pile extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * 
@@ -150,40 +150,49 @@ class Pile extends TestCase
 	}
 
 
-	public function testSetAttr($name, $value)
-	{		
-		$name = "testName";
-		$value = "testeValue"
-		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
-			if(v::stringType()->validate($value)){
-				$this->populateMsgAttr($name, $value);	
-				return $this;
-			}else if(v::intType()->intVal()->validate($value)){
-				$this->populateMsgAttr($name, $value);
-				return $this;
-			}else{
-				throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
-			}
-		}else{
-			throw new RuntimeException("Invalid attribute name for \'$name\' or \'$value' setted.");
-		}	
+	/****************Tests****************************************/
+ /**
+ * @expectedException \Exception
+ * @covers 
+ */
+	public function testSetAttr(){
+	$testPile = new Pile();
+	$testPile->setAttr(5,"string");
+   	}
 
-		$this->assertEquals(isString($name),$name));
-	}
+   	/**
+ * @expectedException \Exception
+ * @covers 
+ */
+	public function testSetAttr2(){
+	$testPile = new Pile();
+	$testPile->setAttr(true,"string");
+   	}
 
-	 public function testPushAndPop()
-    {
-        $stack = array();
-        $this->assertEquals(0, count($stack));
+   	 	/**
+ * @expectedException \Exception
+ * @covers 
+ */
+	public function testSetAttr3(){
+	$testPile = new Pile();
+	$testPile->setAttr(null,"string");
+   	}
 
-        array_push($stack, 'foo');
-        $this->assertEquals('foo', $stack[count($stack)-1]);
-        $this->assertEquals(1, count($stack));
+   	 	 	/**
+ * @expectedException \Exception
+ * @covers 
+ */
+	public function testSetAttr4(){
+	$testPile = new Pile();
+	$testPile->setAttr(null,null);
+   	}
 
-        $this->assertEquals('foo', array_pop($stack));
-        $this->assertEquals(0, count($stack));
-    }
-
-
-
+   	 	 	/**
+ * @expectedException \Exception
+ * @covers 
+ */
+	public function testSetAttr5(){
+	$testPile = new Pile();
+	$testPile->setAttr("string",0); /*  check */
+   	}
 }
