@@ -86,7 +86,7 @@ class Pile
 		if(v::stringType()->notEmpty()->validate($attrValue)){
 			$attrTypeValidated = "String";
 			$result = $this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
-		}elseif(v::intType()->notEmpty()->validate($attrValue)){
+		}elseif(v::intType()->notEmpty()->validate($attrValue) || ($attrValue === 0)){
 			$attrTypeValidated = "Number";	
 			$result = $this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
 		}else{
@@ -228,10 +228,10 @@ class Pile
 	 */
 	public function setAttr($name, $value)
 	{		
-		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
+		if(v::stringType()->notEmpty()->validate($name) && isset($value)){
 			if(v::stringType()->validate($value)){
 				$this->populateMsgAttr($name, $value);	
-			}else if(v::intType()->intVal()->validate($value)){
+			}else if(v::intType()->intVal()->validate($value) || ($value === 0)){
 				$this->populateMsgAttr($name, $value);
 			}else{
 				throw new RuntimeException("Invalid attribute name for $name: $value setted.");

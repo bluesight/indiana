@@ -7,6 +7,6 @@ use Indiana\Queue\Pile;
 $pile = new Pile();
 
 $pile->setQueueName("OpTest")
-	->setAttr("FIRST_ATTR_NAME", "FIRST_ATTR_VALUE")
-	->setAttr("SECOND_ATTR_NAME", "ATTR_VALUE")
+	->setAttr("FIRST_ATTR_NAME12", 0)
+	->setAttr("SECOND_ATTR_NAME2", "ATTR_VALUE2")
 	->send();

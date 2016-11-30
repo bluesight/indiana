@@ -89,7 +89,7 @@ class Pile extends \PHPUnit_Framework_TestCase
 			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
 			return $result;
 			
-		}elseif(v::intType()->notEmpty()->validate($attrValue)){
+		}elseif(v::intType()->notEmpty()->validate($attrValue) or($attrValue === 0)){
 			$attrTypeValidated = "Number";	
 			$result = $this->arrayPopulate($attrName,$attrValue,$attrTypeValidated);
 			return $result;
@@ -134,11 +134,11 @@ class Pile extends \PHPUnit_Framework_TestCase
 	 */
 	public function setAttr($name, $value)
 	{		
-		if(v::stringType()->notEmpty()->validate($name) && v::notEmpty()->validate($value)){
+		if(v::stringType()->notEmpty()->validate($name) && isset($value)){
 			if(v::stringType()->validate($value)){
 				$this->populateMsgAttr($name, $value);	
 				return $this;
-			}else if(v::intType()->intVal()->validate($value)){
+			}else if(v::intType()->intVal()->validate($value) or ($value === 0)){
 				$this->populateMsgAttr($name, $value);
 				return $this;
 			}else{
@@ -188,11 +188,34 @@ class Pile extends \PHPUnit_Framework_TestCase
    	}
 
    	 	 	/**
- * @expectedException \Exception
+ *
  * @covers 
  */
 	public function testSetAttr5(){
 	$testPile = new Pile();
 	$testPile->setAttr("string",0); /*  check */
-   	}
+	}
+
+	   	 	 	/**
+ * @expectedException \Exception
+ * @covers 
+ */
+	public function testSetAttr6(){
+	$testPile = new Pile();
+	$testPile->setAttr(0,1); 
+	}
+
+	  	 	 	
+	public function testMockSetAttr(){
+
+	$param = ["string1","string2"];	
+		
+	$stub = $this->getMockBuilder('Indiana\Queue\Pile')->getMock();
+	$stub->method('setAttr')->with("teste1","teste2")->willReturn("ok");
+
+
+	$this->assertEquals('ok',$stub->setAttr("teste1","teste2"));
+	}
+
+	
 }
