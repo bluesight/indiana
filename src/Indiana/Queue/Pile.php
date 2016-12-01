@@ -43,6 +43,8 @@ class Pile
 	 */
 	private $messageId = "";
 
+	private $messageIdGroup = array();
+
 	private $count = 0;
 
 	/**
@@ -78,13 +80,16 @@ class Pile
 	 */
 	private $queueObjToSend = array();
 
+		public function getIdGroup()
+		{
+			return  $this->messageAttributes
+		}
 	/**
 	 * Verifiy te type of DataType and set String or Number
 	 * @return Array 	Data will be increased in messageAttributes var
  	 */
 	private function populateMsgAttr($attrName, $attrValue)
 	{
-
 		if(v::stringType()->notEmpty()->validate($attrValue)){
 			$attrTypeValidated = "String";
 			$result = $this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
@@ -110,8 +115,8 @@ class Pile
 			throw new RunTimeException("Invalid attribute \'$attrName\' for messageAttributes array. Key name already setted!");
 		}
 		$this->messageAttributes[$attrName] = [
-			"StringValue" =>$attrValue, 
-			"DataType" => $attrTypeValidated
+			"StringValue"	=>	$attrValue, 
+			"DataType" 		=> 	$attrTypeValidated
 		];
 		return $this->messageAttributes; 
 	}
@@ -140,11 +145,10 @@ class Pile
 		if(!v::stringType()->notEmpty()->validate($this->queueUrl)){
 			throw new RunTimeException("Invalid queueUrl.  Paramenter not setted!");
 		}
-
 		$this->queueObjToSend = array(
-			"QueueUrl"=> $this->queueUrl,
-			"MessageBody" => $this->messageBody,
-			"DelaySeconds" => $this->delaySeconds,
+			"QueueUrl"			=> $this->queueUrl,
+			"MessageBody" 		=> $this->messageBody,
+			"DelaySeconds"	 	=> $this->delaySeconds,
 			'MessageAttributes' => $this->messageAttributes
 		);
 	}
@@ -230,9 +234,7 @@ class Pile
 	 */
 	public function setAttr($name, $value)
 	{	
-
-	$this->countMessage();
-
+		$this->countMessage();
 		if(v::stringType()->notEmpty()->validate($name) && isset($value)){
 			if(v::stringType()->validate($value)){
 				$this->populateMsgAttr($name, $value);	
@@ -247,7 +249,8 @@ class Pile
 		return $this;
 	}
 
-	public function countMessage(){
+	public function countMessage()
+	{
 		if($this->count == 10){
 		throw new RunTimeException("Attributed setted is higher than 10");
 		}else{
@@ -255,35 +258,40 @@ class Pile
 		}
 	}
 
-	public function configSqsBatch(){
-
+	public function configSqsBatch()
+	{
 		if(!v::stringType()->notEmpty()->validate($this->queueUrl)){
 			throw new RunTimeException("Invalid queueUrl.  Paramenter not setted!");
 		}
-		
-					$this->messageAttributes;
+			$this->messageAttributes;
 	}
 
-	public function setBatchMessage(){
-	
+	public function setBatchMessage()
+	{
 		$this->getQueueUrl()
-		 ->configSqsBatch();
+		->configSqsBatch();
+	}
+
+	public function saveId($id)
+	{
+		$this->messageIdGroup[] = $id;
 	}
 
 	/**
 	 * Construct the array to be setted and sended by aws
 	 * @return [type] [description]
 	 */
-	public function configBatch(){
+	public function configBatch()
+	{
 		$idmd5 = md5($this->messageId = rand(10,100)); 
-
+		$this->saveId($idmd5);
 		$this->queueObjToSendBatch = array(
 			"QueueUrl"=> $this->queueUrl,
 			"Entries" => array(
 					array(
-					"Id" => $idmd5,
-					"MessageBody" => $this->messageBody,
-					"DelaySeconds" => $this->delaySeconds,
+					"Id" 				=> $idmd5,
+					"MessageBody" 		=> $this->messageBody,
+					"DelaySeconds" 		=> $this->delaySeconds,
 					"MessageAttributes" => $this->messageAttributes)
 			));
 		return $this->queueObjToSendBatch;
@@ -293,27 +301,23 @@ class Pile
 	 * Send message attributes and message body to queue up to 10 attributtes
 	 * @return Object returned by Aws\Sqs\SqsClient sendMessage method
 	 */
-	public function sendBatch(){
-
-		$batch = $this->configBatch();	
-		
-		$sqs      = $this->getSqsClient();
-		$callback = $sqs->sendMessageBatch($this->queueObjToSendBatch);
-
+	public function sendBatch()
+	{
+		$batch 		= $this->configBatch();	
+		$sqs      	= $this->getSqsClient();
+		$callback 	= $sqs->sendMessageBatch($this->queueObjToSendBatch);
 		return $callback;	
 	}
 	/**
 	 * Send message attributes and message body to the queue named
 	 * @return Object 	Object returned by Aws\Sqs\SqsClient sendMessage method
 	 */
-	public function send(){
-		
+	public function send()
+	{
 		$teste = $this->getQueueUrl()
-			->configSqsObj();
-
+		->configSqsObj();
 		$sqs      = $this->getSqsClient();
 		$callback = $sqs->sendMessage($this->queueObjToSend);
-
 		return $callback;
-	}
+	}	
 }
