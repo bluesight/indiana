@@ -43,8 +43,16 @@ class Pile
 	 */
 	private $messageId = "";
 
+	/**
+	 * [$messageIdGroup description]
+	 * @var array
+	 */
 	private $messageIdGroup = array();
 
+	/**
+	 * [$count description]
+	 * @var integer
+	 */
 	private $count = 0;
 
 	/**
@@ -80,10 +88,15 @@ class Pile
 	 */
 	private $queueObjToSend = array();
 
-		public function getIdGroup()
-		{
-			return  $this->messageAttributes
-		}
+	/**
+	 * [getIdGroup description]
+	 * @return [type] [description]
+	 */
+	public function getIdGroup()
+	{
+		return  $this->messageAttributes
+	}
+
 	/**
 	 * Verifiy te type of DataType and set String or Number
 	 * @return Array 	Data will be increased in messageAttributes var
@@ -249,6 +262,10 @@ class Pile
 		return $this;
 	}
 
+	/**
+	 * [countMessage description]
+	 * @return [type] [description]
+	 */
 	public function countMessage()
 	{
 		if($this->count == 10){
@@ -258,6 +275,10 @@ class Pile
 		}
 	}
 
+	/**
+	 * [configSqsBatch description]
+	 * @return [type] [description]
+	 */
 	public function configSqsBatch()
 	{
 		if(!v::stringType()->notEmpty()->validate($this->queueUrl)){
@@ -266,12 +287,20 @@ class Pile
 			$this->messageAttributes;
 	}
 
+	/**
+	 * [setBatchMessage description]
+	 */
 	public function setBatchMessage()
 	{
 		$this->getQueueUrl()
 		->configSqsBatch();
 	}
 
+	/**
+	 * [saveId description]
+	 * @param  [type] $id [description]
+	 * @return [type]     [description]
+	 */
 	public function saveId($id)
 	{
 		$this->messageIdGroup[] = $id;
@@ -308,6 +337,7 @@ class Pile
 		$callback 	= $sqs->sendMessageBatch($this->queueObjToSendBatch);
 		return $callback;	
 	}
+	
 	/**
 	 * Send message attributes and message body to the queue named
 	 * @return Object 	Object returned by Aws\Sqs\SqsClient sendMessage method
