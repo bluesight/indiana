@@ -6,9 +6,9 @@ use Indiana\Queue\Pile;
 
 $pile = new Pile();
 
-
-$pile->setQueueName("OpTest")
-	->setAttr("", 1)
+echo "<pre>";
+$a =$pile->setQueueName("OpTest")
+	->setAttr("a", 1)
 	->setAttr("secondname",2)
 	->setAttr("third", "tres")
 	->setAttr("fourth", "quatro")
@@ -17,5 +17,4 @@ $pile->setQueueName("OpTest")
 	->setAttr("seventh", "sete")	
 	->setAttr("eighth", 8)
 	->setAttr("nineth", 9)
-	->setAttr("tenth", "dez")
-	->send();
+	->setAttr("tenth", "dez");
