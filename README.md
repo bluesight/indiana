@@ -1,6 +1,6 @@
-![SQS Populate](http://i.imgur.com/iSbZURK.png) 
+![Indiana](http://i.imgur.com/AELQUn9.png) 
 
-# SQS Populate
+# Indiana
 
 This is service to populate queues in AWS SQS, parsing data and making your job smooth.
 
