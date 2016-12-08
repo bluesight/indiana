@@ -5,10 +5,8 @@ require '../vendor/autoload.php';
 use Indiana\Queue\Pile;
 
 $pile = new Pile();
-
-$queueName = "OpTest";
-$pile->setQueueName($queueName);
-$count = 0;
+$pile->setQueueName("OpTest");
+count = 0;
 
 $array = [
 	"nameBatch1"  => "ValueBatch1",
@@ -22,11 +20,7 @@ $array = [
 	"nameBatch9"  => "valueBatch9",
 	"nameBatch10" => "valueBatch10"		
 ];
-/**
- * [$value description]
- * @var $count [integer]
- * must be setted at maximum 10
- */
+
 foreach($array as $value => $key){
 
 	$pile->setAttr($value,$key)

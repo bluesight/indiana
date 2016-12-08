@@ -1,126 +1,109 @@
 <?php
 
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- * 
- */
-
 namespace Indiana\Queue;
 
 use Aws\Sqs\SqsClient;
 use Respect\Validation\Validator as v;
 
+/**
+ * Indiana Queue
+ *
+ * It's a litle wrapper to help applications send messages to 
+ * queues in Amazon SQS.
+ *
+ * @package indiana
+ * @subpackage Queue
+ * @author Wallison Marra
+ * @author Bruno Alves
+ * @copyright Indiana Queue (c) Blue Sight 
+ * @link https://aws.amazon.com/sqs/
+ * 
+ */
+
 class Pile
 {
 	/**
-	 * Default AWS SQS API version
-	 * @var String
+	 * @var String Default AWS API Version
 	 */
 	private $sqsApiVersion = 'latest';
 
 	/**
-	 * Default AWS region
-	 * @var String
+	 * @var String Default AWS region
 	 */
 	private $awsRegion = 'us-east-1';
 
 	/**
-	 * Delay seconds to make message visible in the queue named
-	 * @var integer
+	 * @var Integer Delay seconds to make message visible in the queue named
 	 */
 	private $delaySeconds = 5;
 
 	/**
-	 * 
-	 * @var string
+	 * @var String
 	 */
 	private $messageId = "";
 
 	/**
-	 * [$messageIdGroup description]
 	 * @var array
 	 */
 	private $messageIdGroup = array();
 
 	/**
-	 * [$count description]
-	 * @var integer
+	 * @var Integer Count attrs addes in $messageAttributes
 	 */
 	private $count = 0;
 
 	/**
-	 * Message body to send to the queue.
-	 * This is required by the queue, so we need to pass some String value to it.
-	 * This var is limited of 256kbps
-	 * @var String
+	 * @var String Message body to send to the queue
 	 */
 	private $messageBody = 'Empty';
 
 	/**
-	 * Object to increment all attributes to send to the queue
-	 * This var is limited by 10 attributes
-	 * @var Array
+	 * @var Array Object to increment all attributes to send to the queue. This var is limited by 10 attributes
 	 */
 	private $messageAttributes = array();
 
 	/**
-	 * Queue name
-	 * @var String
+	 * @var String Queue name
 	 */
 	private $queueName = '';
 
 	/**
-	 * URL queue
-	 * @var String
+	 * @var String URL Queue
 	 */
 	private $queueUrl = '';
 
 	/**
-	 * All configured object queue to send
-	 * @var array
+	 * @var Array All configured object queue to send
 	 */
 	private $queueObjToSend = array();
 
 	/**
-	 * [getIdGroup description]
-	 * @return [type] [description]
-	 */
-	public function getIdGroup()
-	{
-		return  $this->messageAttributes
-	}
-
-	/**
 	 * Verifiy te type of DataType and set String or Number
-	 * @return Array 	Data will be increased in messageAttributes var
+	 * @param String $attrName attribute name
+	 * @param (Interger|String) $attrValue attribute value
+	 * @return Array Data will be increased in messageAttributes var
+	 * @throws RunTimeException
  	 */
 	private function populateMsgAttr($attrName, $attrValue)
 	{
 		if(v::stringType()->notEmpty()->validate($attrValue)){
 			$attrTypeValidated = "String";
-			$result = $this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
+			$this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
 		}elseif(v::intType()->notEmpty()->validate($attrValue) || ($attrValue === 0)){
 			$attrTypeValidated = "Number";	
-			$result = $this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
+			$this->addMessageAttribute($attrName,$attrValue,$attrTypeValidated);
 		}else{
 			throw new RunTimeException("Invalid attribute attrType for \'$attrType\'setted.");
 		}
-		return $result;
 	}
 
 	/**
 	 * Each interation will be increased in messageAttributes
-	 * @param  String      		Must be String
-	 * @param  String,Integer  	Must be String or Integer
-	 * @param  String  			String with values "string" or "number"
-	 * @return Array 			Returns array to be setted on message attribute
+	 * @param String $attrName Must be String
+	 * @param (String|Integer) $attrValue Must be String or Integer
+	 * @param String $attrTypeValidated String with values "string" or "number"
+	 * @return Array Returns array to be setted on message attribute
+	 * @throws RunTimeException
 	 */
 	private function addMessageAttribute($attrName,$attrValue,$attrTypeValidated)
 	{
@@ -128,15 +111,16 @@ class Pile
 			throw new RunTimeException("Invalid attribute \'$attrName\' for messageAttributes array. Key name already setted!");
 		}
 		$this->messageAttributes[$attrName] = [
-			"StringValue"	=>	$attrValue, 
-			"DataType" 		=> 	$attrTypeValidated
+			"StringValue" => $attrValue, 
+			"DataType"    => $attrTypeValidated
 		];
 		return $this->messageAttributes; 
 	}
 
 	/**
 	 * Get url for the queue named
-	 * @return Void
+	 * @return Indiana\Queue\Pile
+	 * @throws RunTimeException
 	 */
 	private function getQueueUrl()
 	{
@@ -144,6 +128,11 @@ class Pile
 		$url = $sqs->getQueueUrl(
 			array('QueueName' => $this->queueName)
 		);
+
+		if(!$url->get('QueueUrl')) {
+			throw new RunTimeException("Invalid Queue Name");
+		}
+
 		$this->queueUrl = $url->get('QueueUrl');
 		return $this;
 	}
@@ -155,9 +144,6 @@ class Pile
 	 */
 	private function configSqsObj()
 	{
-		if(!v::stringType()->notEmpty()->validate($this->queueUrl)){
-			throw new RunTimeException("Invalid queueUrl.  Paramenter not setted!");
-		}
 		$this->queueObjToSend = array(
 			"QueueUrl"			=> $this->queueUrl,
 			"MessageBody" 		=> $this->messageBody,
@@ -167,10 +153,10 @@ class Pile
 	}
 
 	/**
-	 * Prepare SqsClient and return it
-	 * @return Object Object for Aws\Sqs\SqsClient
+	 * Prepare AWS SqsClient
+	 * @return Object AWs\Sqs\SqsClient
 	 */
-	private function getSqsClient()
+	private function setSqsClient()
 	{
 		return new SqsClient(
 			array(
@@ -182,8 +168,9 @@ class Pile
 
 	/**
 	 * Set queue name
-	 * @param String 	Queue name will be setted here
-	 * @return Object 	Itself
+	 * @param String $sqsApiVersion Queue name will be setted here
+	 * @return Indiana\Queue\Pile
+	 * @throws RuntimeException
 	 */
 	public function setSqsApiVerison($sqsApiVersion)
 	{
@@ -197,8 +184,9 @@ class Pile
 
 	/**
 	 * Set aws region name
-	 * @param String 	AWS Region name
-	 * @return Object 	Itself.
+	 * @param String $region AWS Region name
+	 * @return Indiana\Queue\Pile
+	 * @throws RuntimeException
 	 */
 	public function setAwsRegion($region)
 	{
@@ -212,8 +200,9 @@ class Pile
 
 	/**
 	 * Set aws region name
-	 * @param Integer 	AWS Region name
-	 * @return Object 	Itself.
+	 * @param Integer $delaySeconds AWS Region name
+	 * @return Indiana\Queue\Pile
+	 * @throws RuntimeException
 	 */
 	public function setDelaySeconds($delaySeconds)
 	{
@@ -227,11 +216,13 @@ class Pile
 	
 	/**
 	 * Set queue name
-	 * @param String 	Queue name will be setted here
+	 * @param String $queueName Queue name will be setted here
+	 * @return Indiana\Queue\Pile
+	 * @throws RuntimeException
 	 */
 	public function setQueueName($queueName)
 	{
-		if(v::stringType()->notEmpty()->validate($queueName)){
+		if(!v::stringType()->notEmpty()->validate($this->queueName)){
 			$this->queueName = $queueName;
 		} else {
 			throw new RunTimeException("Invalid string value to queueName parameter.");
@@ -241,13 +232,14 @@ class Pile
 
 	/**
 	 * Validate paramters before insert to the queue
-	 * @param  String 			Only accepts string
-	 * @param  String,Integer  	Only accepts string on integer
-	 * @return Object 			Itself
+	 * @param String $name Only accepts string
+	 * @param String,Integer $value Only accepts string on integer
+	 * @return Indiana\Queue\Pile
+	 * @throws RuntimeException
 	 */
 	public function setAttr($name, $value)
 	{	
-		$this->countMessage();
+		$this->countAttrs();
 		if(v::stringType()->notEmpty()->validate($name) && isset($value)){
 			if(v::stringType()->validate($value)){
 				$this->populateMsgAttr($name, $value);	
@@ -263,66 +255,46 @@ class Pile
 	}
 
 	/**
-	 * [countMessage description]
-	 * @return [type] [description]
+	 * Keep attr increment control
+	 * @return Void
+	 * @throws RuntimeException
 	 */
-	public function countMessage()
+	public function countAttrs()
 	{
-		if($this->count == 10){
-		throw new RunTimeException("Attributed setted is higher than 10");
-		}else{
+		if($this->count >= 10){
+			throw new RunTimeException("Attributes setted are higher than 10");
+		}
 		$this->count++;	
-		}
 	}
 
 	/**
-	 * [configSqsBatch description]
-	 * @return [type] [description]
+	 * Register ID that identificate message batch
+	 * @param  String $id MD5 hash identifing ID message of send batch message.
+	 * @return Object Indiana\Queue\Pile
 	 */
-	public function configSqsBatch()
-	{
-		if(!v::stringType()->notEmpty()->validate($this->queueUrl)){
-			throw new RunTimeException("Invalid queueUrl.  Paramenter not setted!");
-		}
-			$this->messageAttributes;
-	}
-
-	/**
-	 * [setBatchMessage description]
-	 */
-	public function setBatchMessage()
-	{
-		$this->getQueueUrl()
-		->configSqsBatch();
-	}
-
-	/**
-	 * [saveId description]
-	 * @param  [type] $id [description]
-	 * @return [type]     [description]
-	 */
-	public function saveId($id)
+	public function saveMessageBatchId($id)
 	{
 		$this->messageIdGroup[] = $id;
+		return $this;
 	}
 
 	/**
 	 * Construct the array to be setted and sended by aws
-	 * @return [type] [description]
+	 * @return Void
 	 */
 	public function configBatch()
-	{
-		$idmd5 = md5($this->messageId = rand(10,100)); 
-		$this->saveId($idmd5);
+	{ 
+		$this->saveMessageBatchId(md5(time()));
 		$this->queueObjToSendBatch = array(
 			"QueueUrl"=> $this->queueUrl,
 			"Entries" => array(
-					array(
-					"Id" 				=> $idmd5,
-					"MessageBody" 		=> $this->messageBody,
-					"DelaySeconds" 		=> $this->delaySeconds,
-					"MessageAttributes" => $this->messageAttributes)
-			));
+				array(
+				"Id" 				=> $idmd5,
+				"MessageBody" 		=> $this->messageBody,
+				"DelaySeconds" 		=> $this->delaySeconds,
+				"MessageAttributes" => $this->messageAttributes)
+			)
+		);
 		return $this->queueObjToSendBatch;
 	}
 
@@ -332,22 +304,21 @@ class Pile
 	 */
 	public function sendBatch()
 	{
-		$batch 		= $this->configBatch();	
-		$sqs      	= $this->getSqsClient();
-		$callback 	= $sqs->sendMessageBatch($this->queueObjToSendBatch);
-		return $callback;	
+		$data = $this->configBatch()->setSqsClient()
+					->sendMessageBatch($this->queueObjToSendBatch);
+
+		return $data;	
 	}
 	
 	/**
 	 * Send message attributes and message body to the queue named
-	 * @return Object 	Object returned by Aws\Sqs\SqsClient sendMessage method
+	 * @return object Object returned by Aws\Sqs\SqsClient sendMessage method
 	 */
 	public function send()
 	{
-		$teste = $this->getQueueUrl()
-		->configSqsObj();
-		$sqs      = $this->getSqsClient();
-		$callback = $sqs->sendMessage($this->queueObjToSend);
-		return $callback;
+		$data = $this->getQueueUrl()->configSqsObj()->setSqsClient()
+					->sendMessage($this->queueObjToSend);
+		
+		return $data;
 	}	
 }

@@ -3,7 +3,6 @@
 require '../vendor/autoload.php';
 
 use Indiana\Queue\Pile;
-
 $pile = new Pile();
 
 echo "<pre>";

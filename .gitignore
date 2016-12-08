@@ -1,3 +1,5 @@
 /vendor/
 /examples/Courier.php
 composer.lock
+.vagrant/
+Vagrantfile
