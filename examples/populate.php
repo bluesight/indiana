@@ -5,8 +5,8 @@ require '../vendor/autoload.php';
 use Indiana\Queue\Pile;
 $pile = new Pile();
 
-echo "<pre>";
-$a =$pile->setQueueName("OpTest")
+
+$a = $pile->setQueueName("OpTest")
 	->setAttr("a", 1)
 	->setAttr("secondname",2)
 	->setAttr("third", "tres")
@@ -16,4 +16,7 @@ $a =$pile->setQueueName("OpTest")
 	->setAttr("seventh", "sete")	
 	->setAttr("eighth", 8)
 	->setAttr("nineth", 9)
-	->setAttr("tenth", "dez");
+	->setAttr("tenth", "dez")
+	->send();
+
+var_dump($a);die;

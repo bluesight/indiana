@@ -124,7 +124,7 @@ class Pile
 	 */
 	private function getQueueUrl()
 	{
-		$sqs = $this->getSqsClient();
+		$sqs = $this->setSqsClient();
 		$url = $sqs->getQueueUrl(
 			array('QueueName' => $this->queueName)
 		);
@@ -150,6 +150,7 @@ class Pile
 			"DelaySeconds"	 	=> $this->delaySeconds,
 			'MessageAttributes' => $this->messageAttributes
 		);
+		return $this;
 	}
 
 	/**
@@ -316,9 +317,10 @@ class Pile
 	 */
 	public function send()
 	{
-		$data = $this->getQueueUrl()->configSqsObj()->setSqsClient()
+		$data = $this->getQueueUrl()
+					->configSqsObj()
+					->setSqsClient()
 					->sendMessage($this->queueObjToSend);
-		
 		return $data;
 	}	
 }
